@@ -1,62 +1,45 @@
-// src/components/DateSelector.jsx
 import React, { useState } from 'react';
+import dayjs from 'dayjs';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-// Hardcoded month names for display
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const DateSelector = ({ selectedDate, onSelect }) => {
-  // Control visibility of month/year pickers
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const [showYearPicker, setShowYearPicker] = useState(false);
-
-  // Week days based on the selected starting date
   const days = Array.from({ length: 7 }, (_, i) => selectedDate.add(i, 'day'));
-
-  // ----- Handlers -----
-
-  // When a month is selected
-  const handleMonthSelect = (monthIndex) => {
-    const newDate = selectedDate.month(monthIndex);
-    onSelect(newDate);
-    setShowMonthPicker(false);
-  };
-
-  // When a year is selected
-  const handleYearSelect = (year) => {
-    const newDate = selectedDate.year(year);
-    onSelect(newDate);
-    setShowYearPicker(false);
-  };
-
-  // Dynamic year range (current ±10)
   const currentYear = selectedDate.year();
   const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
 
-  // ----- Render -----
+  const handleMonthSelect = (monthIndex) => {
+    onSelect(selectedDate.month(monthIndex));
+    setShowMonthPicker(false);
+  };
+
+  const handleYearSelect = (year) => {
+    onSelect(selectedDate.year(year));
+    setShowYearPicker(false);
+  };
 
   return (
-    <div className="max-w-full mx-auto mb-6 p-4 bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-gray-700 relative z-10">
+    <div className="max-w-full mx-auto mb-6 p-4 bg-gradient-to-br from-blue-50/60 to-purple-50/60 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-xl border border-gray-200/80 dark:border-gray-600 relative z-10">
 
-      {/* Header Row: Navigation + Month & Year Display */}
+      {/* Header Navigation */}
       <div className="flex items-center justify-between mb-2">
-
-        {/* Left Chevron: Go to Previous Week */}
         <button
           onClick={() => onSelect(selectedDate.subtract(1, 'week'))}
-          className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+          className="p-2 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-700/80 transition-colors"
         >
           <FaChevronLeft className="text-gray-600 dark:text-gray-300" />
         </button>
 
-        {/* Month & Year - Clickable Text to Toggle Picker */}
         <div className="flex items-center gap-2">
           <span
             onClick={() => {
               setShowMonthPicker(!showMonthPicker);
               setShowYearPicker(false);
             }}
-            className="cursor-pointer font-medium text-gray-800 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 px-2 py-1 rounded"
+            className="cursor-pointer font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/80 px-3 py-1.5 rounded-lg transition-colors"
           >
             {selectedDate.format('MMMM')}
           </span>
@@ -65,33 +48,32 @@ const DateSelector = ({ selectedDate, onSelect }) => {
               setShowYearPicker(!showYearPicker);
               setShowMonthPicker(false);
             }}
-            className="cursor-pointer font-medium text-gray-800 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 px-2 py-1 rounded"
+            className="cursor-pointer font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/80 px-3 py-1.5 rounded-lg transition-colors"
           >
             {selectedDate.format('YYYY')}
           </span>
         </div>
 
-        {/* Right Chevron: Go to Next Week */}
         <button
           onClick={() => onSelect(selectedDate.add(1, 'week'))}
-          className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+          className="p-2 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-700/80 transition-colors"
         >
           <FaChevronRight className="text-gray-600 dark:text-gray-300" />
         </button>
       </div>
 
-      {/* ----- Month Picker Dropdown ----- */}
+      {/* Month Picker */}
       {showMonthPicker && (
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-4 grid grid-cols-3 gap-2 z-20 md:w-fit w-full">
-          {months.map((m, index) => (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-3 grid grid-cols-3 gap-2 z-20 backdrop-blur-sm border border-gray-200/80 dark:border-gray-600">
+          {months.map((m, i) => (
             <button
-              key={index}
-              onClick={() => handleMonthSelect(index)}
-              className={`py-1 rounded transition-colors ${
-                selectedDate.month() === index
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-              } hover:bg-blue-400 hover:text-white cursor-pointer`}
+              key={i}
+              onClick={() => handleMonthSelect(i)}
+              className={`px-4 py-2 rounded-lg transition-all ${
+                selectedDate.month() === i
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                  : 'bg-gray-100/80 dark:bg-gray-700/80 text-gray-700 dark:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-600/80'
+              }`}
             >
               {m}
             </button>
@@ -99,18 +81,18 @@ const DateSelector = ({ selectedDate, onSelect }) => {
         </div>
       )}
 
-      {/* ----- Year Picker Dropdown ----- */}
+      {/* Year Picker */}
       {showYearPicker && (
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-4 grid grid-cols-4 gap-2 z-20 md:w-fit w-full">
-          {years.map((yr) => (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-3 grid grid-cols-4 gap-2 z-20 backdrop-blur-sm border border-gray-200/80 dark:border-gray-600">
+          {years.map(yr => (
             <button
               key={yr}
               onClick={() => handleYearSelect(yr)}
-              className={`py-1 rounded transition-colors ${
+              className={`px-3 py-2 rounded-lg transition-all ${
                 selectedDate.year() === yr
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-              } hover:bg-blue-400 hover:text-white cursor-pointer`}
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                  : 'bg-gray-100/80 dark:bg-gray-700/80 text-gray-700 dark:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-600/80'
+              }`}
             >
               {yr}
             </button>
@@ -118,22 +100,29 @@ const DateSelector = ({ selectedDate, onSelect }) => {
         </div>
       )}
 
-      {/* ----- Week Day Buttons ----- */}
-      <div className="grid grid-cols-7 gap-1 mt-4">
-        {days.map((date) => (
-          <button
-            key={date.format('YYYY-MM-DD')}
-            onClick={() => onSelect(date)}
-            className="p-2 text-center rounded bg-blue-100 dark:bg-blue-900"
-          >
-            <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {date.format('ddd')}
-            </div>
-            <div className="text-lg text-gray-800 dark:text-gray-100">
-              {date.format('D')}
-            </div>
-          </button>
-        ))}
+      {/* Week Days */}
+      <div className="grid grid-cols-7 gap-1.5 mt-4">
+        {days.map(date => {
+          const isToday = date.isSame(dayjs(), 'day');
+          return (
+            <button
+              key={date.format('YYYY-MM-DD')}
+              onClick={() => onSelect(date)}
+              className={`p-2 flex flex-col items-center justify-center rounded-xl transition-all ${
+                isToday
+                  ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-md'
+                  : 'bg-white/80 dark:bg-gray-700/80 hover:bg-gray-100/80 dark:hover:bg-gray-600/80'
+              } border border-gray-200/80 dark:border-gray-600`}
+            >
+              <div className={`text-sm font-medium ${isToday ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+                {date.format('ddd')}
+              </div>
+              <div className={`text-lg font-semibold ${isToday ? 'text-white' : 'text-gray-800 dark:text-gray-200'}`}>
+                {date.format('D')}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

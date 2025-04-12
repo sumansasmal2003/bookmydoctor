@@ -1,37 +1,30 @@
-// src/components/ToastNotification.jsx
 import React from 'react';
-import { FaTimes, FaCheckCircle } from 'react-icons/fa'; // Icons for notification
-import { motion } from 'framer-motion'; // Animation library
+import { FaTimes, FaCheckCircle } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
-/**
- * ToastNotification component
- * Displays a temporary notification message with animation and styling.
- */
-const ToastNotification = ({ message, onClose, color = 'bg-green-500' }) => (
+const ToastNotification = ({ message, onClose, color = 'from-green-500 to-blue-500' }) => (
   <motion.div
-    // Animate the toast sliding in from the bottom with fade effect
     initial={{ y: 100, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
     exit={{ y: 100, opacity: 0 }}
-    // Responsive positioning: center top for mobile, top-right for larger screens
     className={`fixed top-4 left-1/2 transform -translate-x-1/2
       sm:left-auto sm:translate-x-0 sm:top-4 sm:right-4
-      p-4 pr-8 rounded-lg text-white shadow-xl flex items-center gap-3
-      max-w-sm w-full z-50 ${color}`}
+      p-4 pr-8 rounded-xl shadow-xl flex items-center gap-3
+      max-w-sm w-full z-50 backdrop-blur-sm
+      bg-gradient-to-r ${color} dark:${color.replace(/from|to/g, m => m + '-600')}
+      border border-white/20 dark:border-gray-600/80
+      ring-1 ring-black/5 dark:ring-white/10`}
   >
-    {/* Success Icon */}
-    <FaCheckCircle className="text-xl" />
+    <FaCheckCircle className="text-xl text-white/90 dark:text-gray-100" />
 
-    {/* Notification Text */}
-    <span className="font-medium">{message}</span>
+    <span className="font-medium text-white/95 dark:text-gray-100">{message}</span>
 
-    {/* Close Button */}
     <button
       onClick={onClose}
-      className="absolute top-2 right-2 focus:outline-none"
+      className="absolute top-2 right-2 p-1 rounded-full hover:bg-white/10 transition-colors"
       aria-label="Close Notification"
     >
-      <FaTimes className="text-white/80 hover:text-white" />
+      <FaTimes className="w-4 h-4 text-white/80 hover:text-white dark:text-gray-300" />
     </button>
   </motion.div>
 );

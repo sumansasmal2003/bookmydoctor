@@ -156,51 +156,63 @@ const AppointmentModal = ({
   const formattedDate = dayjs(date).format('MMMM D, YYYY');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-purple-100/50 dark:bg-gray-900/75 backdrop-blur-sm p-2">
-      <div className="bg-indigo-50 dark:bg-gray-900 rounded-2xl shadow-2xl p-6 w-full max-w-md relative border-2 border-purple-100 dark:border-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center
+      bg-gradient-to-br from-blue-50/60 to-purple-50/60 backdrop-blur-sm
+      dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 p-2">
+
+      <div className="relative bg-white/95 dark:bg-gray-800/95 rounded-2xl
+        shadow-xl p-6 w-full max-w-xl border border-gray-200/80
+        dark:border-gray-600 ring-1 ring-black/5
+        dark:ring-white/10 overflow-y-auto">
 
         {/* Modal Header */}
-        <div className="flex justify-between items-center mb-6 pb-4 border-b border-purple-200 dark:border-gray-800">
-          <h2 className="text-sm font-bold text-purple-900 dark:text-purple-300 flex items-center gap-3">
-            <FaCalendarAlt className="text-purple-600 dark:text-purple-400" />
+        <div className="flex justify-between items-center mb-6 pb-4
+          border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-bold flex items-center gap-3
+            bg-gradient-to-r from-blue-600 to-purple-600
+            dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+            <FaCalendarAlt className="text-blue-500 dark:text-purple-400" />
             {isEditMode ? 'Edit Appointment' : 'New Appointment'} on {formattedDate}
           </h2>
           <button
             onClick={onClose}
-            className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300"
+            className="text-gray-500 hover:text-gray-700
+              dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
             aria-label="Close"
           >
-            <FaTimes size={18} />
+            <FaTimes size={20} />
           </button>
         </div>
 
-        {/* ------------------------------ */}
         {/* Modal Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
 
           {/* Patient Name Input */}
           <div>
-            <label className="block text-sm font-medium text-purple-800 dark:text-purple-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
               Patient Name
             </label>
             <div className="relative">
-              <FaUser className="absolute top-2.5 left-3 text-purple-500" />
+              <FaUser className="absolute top-3 left-3 text-blue-500 dark:text-purple-400" />
               <input
                 name="patientName"
                 value={formData.patientName}
                 onChange={handleInputChange}
                 placeholder="Enter full name"
-                className="pl-10 w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="pl-10 w-full p-2.5 rounded-lg border border-gray-300/90
+                  dark:border-gray-600 bg-white/95 dark:bg-gray-700/95
+                  text-gray-900 dark:text-gray-100 focus:ring-2
+                  focus:ring-blue-300/50 dark:focus:ring-purple-400/50"
                 required
               />
             </div>
           </div>
 
-          {/* Start & End Time */}
+          {/* Time Inputs */}
           <div className="grid grid-cols-2 gap-4">
             {['startTime', 'endTime'].map((field, i) => (
               <div key={field}>
-                <label className="block text-sm font-medium text-purple-800 dark:text-purple-200 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   {i === 0 ? 'Start Time' : 'End Time'}
                 </label>
                 <input
@@ -208,7 +220,10 @@ const AppointmentModal = ({
                   name={field}
                   value={formData[field]}
                   onChange={handleInputChange}
-                  className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full p-2.5 rounded-lg border border-gray-300/90
+                    dark:border-gray-600 bg-white/95 dark:bg-gray-700/95
+                    text-gray-900 dark:text-gray-100 focus:ring-2
+                    focus:ring-blue-300/50 dark:focus:ring-purple-400/50"
                   required
                 />
               </div>
@@ -217,19 +232,21 @@ const AppointmentModal = ({
 
           {/* Doctor Selector */}
           <div>
-            <label className="block text-sm font-medium text-purple-800 dark:text-purple-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
               Select Doctor
             </label>
             <div className="relative">
-              <FaUserMd className="absolute top-2.5 left-3 text-purple-500" />
+              <FaUserMd className="absolute top-3 left-3 text-purple-500 dark:text-blue-400" />
               <select
                 name="doctor"
                 value={formData.doctor}
                 onChange={handleInputChange}
-                className="pl-10 w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="pl-10 w-full p-2.5 rounded-lg border border-gray-300/90
+                  dark:border-gray-600 bg-white/95 dark:bg-gray-700/95
+                  text-gray-900 dark:text-gray-100 focus:ring-2
+                  focus:ring-blue-300/50 dark:focus:ring-purple-400/50"
                 required
               >
-                <option value="">Select Doctor</option>
                 {doctors.map(doc => (
                   <option key={doc.id} value={doc.id}>{doc.name}</option>
                 ))}
@@ -237,16 +254,19 @@ const AppointmentModal = ({
             </div>
           </div>
 
-          {/* Category */}
+          {/* Category Selector */}
           <div>
-            <label className="block text-sm font-medium text-purple-800 dark:text-purple-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
               Appointment Category
             </label>
             <select
               name="category"
               value={formData.category}
               onChange={handleInputChange}
-              className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="w-full p-2.5 rounded-lg border border-gray-300/90
+                dark:border-gray-600 bg-white/95 dark:bg-gray-700/95
+                text-gray-900 dark:text-gray-100 focus:ring-2
+                focus:ring-blue-300/50 dark:focus:ring-purple-400/50"
             >
               {Object.keys(categoryColors).filter(c => c !== 'default').map(c => (
                 <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
@@ -254,9 +274,9 @@ const AppointmentModal = ({
             </select>
           </div>
 
-          {/* Additional Notes */}
+          {/* Details Textarea */}
           <div>
-            <label className="block text-sm font-medium text-purple-800 dark:text-purple-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
               Details (Optional)
             </label>
             <textarea
@@ -265,25 +285,40 @@ const AppointmentModal = ({
               onChange={handleInputChange}
               rows="2"
               placeholder="e.g. symptoms, conditions..."
-              className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="w-full p-2.5 rounded-lg border border-gray-300/90
+                dark:border-gray-600 bg-white/95 dark:bg-gray-700/95
+                text-gray-900 dark:text-gray-100 focus:ring-2
+                focus:ring-blue-300/50 dark:focus:ring-purple-400/50"
             />
           </div>
 
-          {/* Error Display */}
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {/* Error Message */}
+          {error && (
+            <p className="text-red-500 dark:text-red-400 text-sm text-center font-medium">
+              {error}
+            </p>
+          )}
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-2 pt-3">
+          <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-4 rounded-lg hover:opacity-90"
+              className="px-5 py-2.5 rounded-lg font-medium
+                bg-gray-100 hover:bg-gray-200 text-gray-700
+                dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100
+                transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-purple-600 text-white py-2 px-5 rounded-lg hover:bg-purple-700"
+              className="px-6 py-2.5 rounded-lg font-medium text-white
+                bg-gradient-to-r from-blue-600 to-purple-600
+                dark:from-blue-700 dark:to-purple-700
+                hover:from-blue-700 hover:to-purple-700
+                dark:hover:from-blue-600 dark:hover:to-purple-600
+                transition-all"
             >
               {isEditMode ? 'Save Changes' : 'Book Now'}
             </button>

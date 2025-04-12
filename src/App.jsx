@@ -126,7 +126,7 @@ const App = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 font-sans">
+    <div className="flex h-screen bg-gradient-to-br from-blue-50/60 to-purple-50/60 dark:from-gray-900 dark:to-gray-800 font-sans">
       {/* Sidebar Navigation */}
       <Sidebar
         currentView={currentView}
@@ -139,7 +139,7 @@ const App = () => {
       {/* Main Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header Bar */}
-        <header className="bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center">
+        <header className="bg-white/90 dark:bg-gray-800/90 shadow-lg p-4 flex justify-between items-center backdrop-blur-sm border-b border-gray-200/80 dark:border-gray-600">
           <div className="flex items-center space-x-4">
             <button
               onClick={toggleSidebar}
@@ -150,7 +150,7 @@ const App = () => {
             </button>
             <button
               onClick={toggleTheme}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none border rounded-full cursor-pointer border-zinc-800 dark:border-white shadow-xl"
               aria-label="Toggle theme"
             >
               {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
@@ -158,15 +158,15 @@ const App = () => {
           </div>
           {/* App Title */}
           <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-rose-500 via-fuchsia-500 to-cyan-500">
+            <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
               BookMyDoctor
             </h1>
-            <FaHandHoldingMedical className="text-rose-400 text-2xl" />
+            <FaHandHoldingMedical className="text-purple-400 text-2xl dark:text-purple-300" />
           </div>
         </header>
 
         {/* Main View Logic */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900 p-4 md:p-6 lg:p-8">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 lg:p-8">
           {currentView === 'booking' && (
             <>
               <DateSelector selectedDate={weekStart} onSelect={handleDateSelect} />
@@ -181,13 +181,13 @@ const App = () => {
 
           {currentView === 'appointments' && (
             <div className="space-y-6">
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+              <div className="bg-white/90 dark:bg-gray-800/90 p-4 rounded-xl shadow-xl backdrop-blur-sm border border-gray-200/80 dark:border-gray-600">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
                   <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Appointments Overview</h2>
                   <select
                     value={filteredDoctorId}
                     onChange={(e) => setFilteredDoctorId(e.target.value)}
-                    className="p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600"
+                    className="p-2 rounded-lg border border-gray-300/90 dark:border-gray-600 bg-white/95 dark:bg-gray-700/95 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300/50 dark:focus:ring-purple-400/50"
                   >
                     <option value="">All Doctors</option>
                     {doctors.map(doc => (
@@ -229,7 +229,10 @@ const App = () => {
           onClose={handleCloseModal}
           onSave={(appointmentData) => {
             handleSaveAppointment(appointmentData);
-            showNotification(`Appointment ${selectedAppointment ? 'updated' : 'created'} successfully!`, 'bg-green-500');
+            showNotification(
+              `Appointment ${selectedAppointment ? 'updated' : 'created'} successfully!`,
+              'from-green-500 to-blue-500'
+            );
           }}
           existingAppointment={selectedAppointment}
           allAppointments={appointments}

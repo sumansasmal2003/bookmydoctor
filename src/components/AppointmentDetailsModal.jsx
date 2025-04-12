@@ -1,34 +1,23 @@
-// src/components/AppointmentDetailsModal.jsx
 import React from 'react';
 import dayjs from 'dayjs';
-import { X } from 'lucide-react'; // Close icon
+import { X } from 'lucide-react';
 
-// -----------------------------
-// Reusable subcomponent to display each detail in a label-value pair
 const DetailItem = ({ label, value }) => (
-  <div className="flex items-start border-b border-gray-200 dark:border-gray-700 pb-2">
-    <dt className="w-1/3 font-medium text-gray-600 dark:text-gray-300 text-sm">
+  <div className="flex items-start border-b border-gray-100 dark:border-gray-600 pb-2">
+    <dt className="w-1/3 font-medium text-gray-700 dark:text-gray-300 text-sm">
       {label}
     </dt>
-    <dd className="w-2/3 text-gray-800 dark:text-gray-100 text-sm">
+    <dd className="w-2/3 text-gray-900 dark:text-gray-100 text-sm">
       {value || 'N/A'}
     </dd>
   </div>
 );
 
-// -----------------------------
-// Main modal component
 const AppointmentDetailsModal = ({ appointment, onClose, doctors }) => {
-  // If no appointment is passed, don't render the modal
   if (!appointment) return null;
 
-  // Find the doctor object from the provided list using the appointment's doctor ID
   const doctor = doctors.find(d => d.id === appointment.doctor);
-
-  // Format appointment date
   const formattedDate = dayjs(appointment.date).format('MMM D, YYYY');
-
-  // Create a time range string: fallback if endTime is missing
   const timeRange = `${appointment.startTime || appointment.time} - ${
     appointment.endTime ||
     dayjs(`${appointment.date} ${appointment.time}`, 'YYYY-MM-DD HH:mm')
@@ -37,28 +26,34 @@ const AppointmentDetailsModal = ({ appointment, onClose, doctors }) => {
   }`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-md p-4">
-      {/* Modal container */}
-      <div className="relative bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-2xl p-8 max-w-lg w-full border border-gray-200 dark:border-gray-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center
+      bg-gradient-to-br from-amber-50 to-blue-100 backdrop-blur-sm
+      dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 p-4">
 
-        {/* Top-right close button */}
+      <div className="relative bg-white/95 dark:bg-gray-800/95 rounded-2xl
+        shadow-xl p-8 max-w-lg w-full border border-gray-200
+        dark:border-gray-600 ring-1 ring-black/5
+        dark:ring-white/10">
+
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 focus:outline-none"
-          aria-label="Close Appointment Details"
+          className="absolute top-4 right-4 text-amber-600 hover:text-amber-700
+            dark:text-gray-300 dark:hover:text-gray-100 transition-colors
+            focus:outline-none cursor-pointer"
+          aria-label="Close"
         >
           <X size={24} />
         </button>
 
-        {/* Modal Title */}
-        <h3 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-gray-100 text-center">
+        <h3 className="text-2xl font-semibold mb-6
+          dark:text-gray-100 text-center bg-gradient-to-r from-amber-600 to-blue-600
+          dark:from-amber-400 dark:to-blue-400 bg-clip-text text-transparent">
           Appointment Details
         </h3>
 
-        {/* Appointment detail fields */}
         <dl className="space-y-4">
           <DetailItem label="Patient" value={appointment.patientName} />
-          <DetailItem label="Doctor" value={doctor ? doctor.name : 'Unknown Doctor'} />
+          <DetailItem label="Doctor" value={doctor?.name || 'Unknown Doctor'} />
           <DetailItem label="Date" value={formattedDate} />
           <DetailItem label="Time" value={timeRange} />
           <DetailItem label="Category" value={appointment.category} />

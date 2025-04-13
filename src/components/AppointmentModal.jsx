@@ -9,14 +9,10 @@ import {
   FaInfoCircle,
 } from 'react-icons/fa';
 
-// Dummy doctor data
-const doctors = [
-  { id: 'doc1', name: 'Dr. Alice Smith (Cardiology)' },
-  { id: 'doc2', name: 'Dr. Bob Johnson (Neurology)' },
-  { id: 'doc3', name: 'Dr. Carol Williams (Pediatrics)' },
-];
+import doctors from '../data/doctors';
+import DoctorSelector from './DoctorSelector';
 
-// Custom styling per category
+// Category color styling (for demonstration)
 const categoryColors = {
   emergency: 'border-red-400 bg-red-50 dark:bg-red-900/30 dark:border-red-600',
   examination: 'border-amber-400 bg-amber-50 dark:bg-amber-900/30 dark:border-amber-600',
@@ -26,20 +22,33 @@ const categoryColors = {
   default: 'border-gray-400 bg-gray-50 dark:bg-gray-900/30 dark:border-gray-600',
 };
 
+/**
+ * AppointmentModal Component
+ *
+ * Props:
+ * - date: the selected date (dayjs object)
+ * - onClose: callback to close the modal
+ * - onSave: callback to save the appointment data
+ * - existingAppointment: if editing, the appointment data to prefill
+ * - allAppointments: array of existing appointments (used for conflict checking)
+ * - initialDoctor: (new prop) the doctor ID selected from the doctor search component,
+ *                  used as the default when creating a new appointment.
+ */
 const AppointmentModal = ({
-  date, // Selected date
-  onClose, // Modal close handler
-  onSave, // Callback to save data
-  existingAppointment, // If editing
-  existingAppointments = [] // All appointments for conflict check
+  date,
+  onClose,
+  onSave,
+  existingAppointment,
+  allAppointments = [],
+  initialDoctor, // New prop for default doctor selection
 }) => {
+  // Determine if we are in edit mode based on existence of existingAppointment prop
   const isEditMode = !!existingAppointment;
 
-  // ------------------------------
-  // Form state initialization
+  // State to hold form data
   const [formData, setFormData] = useState({
     patientName: '',
-    doctor: doctors[0]?.id || '',
+    doctor: '', // Will be initialized in useEffect
     startTime: '09:00',
     endTime: '09:30',
     details: '',
@@ -49,111 +58,138 @@ const AppointmentModal = ({
   const [error, setError] = useState('');
 
   // ------------------------------
-  // Set initial values based on edit or new
+  // useEffect to initialize or update form state when modal opens or relevant props change.
   useEffect(() => {
     if (isEditMode) {
-      // Set data from existing appointment
+      // If editing, populate the form with existing appointment details.
       setFormData({
         patientName: existingAppointment.patientName || '',
-        doctor: existingAppointment.doctor || doctors[0]?.id,
+        doctor: existingAppointment.doctor || (doctors[0]?.id || ''),
+        // For backward compatibility, use existingAppointment.startTime or fallback to time field.
         startTime: existingAppointment.startTime || existingAppointment.time || '09:00',
-        endTime: existingAppointment.endTime || '',
+        endTime: existingAppointment.endTime || '', // Let user adjust if missing.
         details: existingAppointment.details || '',
         category: existingAppointment.category || 'consultation',
       });
-
-      // If no endTime, calculate using duration
+      // If endTime is missing, calculate a default value using duration.
       if (!existingAppointment.endTime && (existingAppointment.startTime || existingAppointment.time)) {
         const start = dayjs(`${existingAppointment.date} ${existingAppointment.startTime || existingAppointment.time}`);
         const duration = typeof existingAppointment.duration === 'number' ? existingAppointment.duration : 30;
         if (start.isValid()) {
           setFormData(prev => ({ ...prev, endTime: start.add(duration, 'minute').format('HH:mm') }));
+        } else {
+          setFormData(prev => ({ ...prev, endTime: '09:30' }));
         }
       }
     } else {
-      // New booking
+      // When creating a new appointment, prefill defaults.
+      // Use initialDoctor if provided; otherwise, use the first doctor.
+      const defaultDoctor = initialDoctor || doctors[0]?.id || '';
       const start = dayjs(date);
       setFormData({
         patientName: '',
-        doctor: doctors[0]?.id || '',
-        startTime: start.format('HH:mm') || '09:00',
-        endTime: start.add(30, 'minute').format('HH:mm') || '09:30',
+        doctor: defaultDoctor,
+        startTime: start.isValid() ? start.format('HH:mm') : '09:00',
+        endTime: start.isValid() ? start.add(30, 'minute').format('HH:mm') : '09:30',
         details: '',
         category: 'consultation',
       });
     }
-  }, [existingAppointment, date, isEditMode]);
+  }, [existingAppointment, date, isEditMode, initialDoctor]);
+
+  // Memoized date strings for display
+  const currentIsoDateStr = isEditMode
+    ? existingAppointment.date
+    : (dayjs(date).isValid() ? dayjs(date).format('YYYY-MM-DD') : '');
+  const currentFormattedDateStr = isEditMode
+    ? dayjs(existingAppointment.date).format('MMMM D, YYYY')
+    : dayjs(date).format('MMMM D, YYYY');
 
   // ------------------------------
-  // Validate conflicts with other appointments
-  const checkConflict = (newAppt) => {
-    const dateStr = dayjs(date).format('YYYY-MM-DD');
-    const newStart = dayjs(`${dateStr} ${newAppt.startTime}`);
-    const newEnd = dayjs(`${dateStr} ${newAppt.endTime}`);
-
-    return existingAppointments.some(appt => {
+  // Conflict checking function: ensures no overlapping appointments for the same doctor.
+  const checkConflict = React.useCallback((newAppt) => {
+    if (!newAppt.date || !newAppt.startTime || !newAppt.endTime) {
+      console.error("Conflict check skipped: Invalid date/time data", newAppt);
+      return false;
+    }
+    const newStart = dayjs(`${newAppt.date} ${newAppt.startTime}`);
+    const newEnd = dayjs(`${newAppt.date} ${newAppt.endTime}`);
+    if (!newStart.isValid() || !newEnd.isValid()) {
+      console.error("Conflict check skipped: Invalid new appointment times", newAppt);
+      return false;
+    }
+    return allAppointments.some(appt => {
+      // Skip self when editing
       if (isEditMode && appt.id === newAppt.id) return false;
-      if (appt.doctor !== newAppt.doctor || appt.date !== dateStr) return false;
-
-      const apptStart = dayjs(`${appt.date} ${appt.startTime || appt.time}`);
-      const apptEnd = dayjs(`${appt.date} ${appt.endTime}`);
-
+      // Check same doctor and date
+      if (appt.doctor !== newAppt.doctor || appt.date !== newAppt.date) return false;
+      // Parse existing appointment times
+      const existingStart = dayjs(`${appt.date} ${appt.startTime || appt.time}`);
+      const existingEnd = appt.endTime
+        ? dayjs(`${appt.date} ${appt.endTime}`)
+        : existingStart.add(appt.duration || 30, 'minute');
+        // Ensure both dates are valid before comparing
+    if (!newStart.isValid() || !newEnd.isValid() || !existingStart.isValid() || !existingEnd.isValid()) {
+        return false;
+      }
+      // Check for overlap
       return (
-        newStart.isBefore(apptEnd) && newEnd.isAfter(apptStart)
-      );
+        (newStart.isBefore(existingEnd) &&
+        newEnd.isAfter(existingStart)
+      ));
     });
-  };
+  }, [allAppointments, isEditMode]);
 
   // ------------------------------
-  // Handle form submission
+  // Handle form submission: validate fields, check conflicts, then call onSave.
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-
     const { patientName, doctor, startTime, endTime } = formData;
-    const dateStr = dayjs(date).format('YYYY-MM-DD');
-
-    // Validation
     if (!patientName || !doctor || !startTime || !endTime) {
       setError('Please fill in all required fields.');
       return;
     }
-
-    const start = dayjs(`${dateStr} ${startTime}`);
-    const end = dayjs(`${dateStr} ${endTime}`);
-    const duration = end.diff(start, 'minute');
-
-    if (!start.isValid() || !end.isValid() || duration <= 0) {
-      setError('End time must be after start time.');
+    // Date handling
+    const todayStr = dayjs().format('YYYY-MM-DD');
+    const appointmentDate = initialDoctor ? todayStr : currentIsoDateStr;
+    if (!appointmentDate) {
+      setError("Cannot save, date is invalid.");
       return;
     }
-
-    const appointment = {
-      ...formData,
-      id: isEditMode ? existingAppointment.id : Date.now(),
-      date: dateStr,
-      duration
+     // Time validation
+     const start = dayjs(`${appointmentDate} ${startTime}`);
+     const end = dayjs(`${appointmentDate} ${endTime}`);
+     if (!start.isValid() || !end.isValid() || end.isBefore(start)) {
+       setError('End time must be after start time.');
+       return;
+     }
+    const appointmentData = {
+    ...formData,
+    id: isEditMode ? existingAppointment.id : Date.now(),
+    date: appointmentDate,
+    duration: end.diff(start, 'minute'),
     };
-
-    if (checkConflict(appointment)) {
-      setError('This time slot is already taken by another appointment.');
-      return;
-    }
-
-    onSave(appointment);
+     // Check for conflicts
+     if (checkConflict(appointmentData)) {
+        setError('This doctor already has an appointment during the selected time.');
+        return;
+      }
+    // Save the appointment and close the modal
+    onSave(appointmentData);
     onClose();
   };
 
   // ------------------------------
-  // Handle form changes
+  // Handle changes in the form inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   // ------------------------------
-  // UI Rendering
-  const formattedDate = dayjs(date).format('MMMM D, YYYY');
+  // Render Modal JSX with proper styling and responsiveness
+  const formattedDate = currentFormattedDateStr;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center
@@ -172,7 +208,11 @@ const AppointmentModal = ({
             bg-gradient-to-r from-blue-600 to-purple-600
             dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
             <FaCalendarAlt className="text-blue-500 dark:text-purple-400" />
-            {isEditMode ? 'Edit Appointment' : 'New Appointment'} on {formattedDate}
+            {isEditMode
+                ? `Edit Appointment on ${formattedDate}`
+                : `New Appointment on ${initialDoctor ? dayjs().format('MMMM D, YYYY') : formattedDate}`
+            }
+
           </h2>
           <button
             onClick={onClose}
@@ -230,29 +270,11 @@ const AppointmentModal = ({
             ))}
           </div>
 
-          {/* Doctor Selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-              Select Doctor
-            </label>
-            <div className="relative">
-              <FaUserMd className="absolute top-3 left-3 text-purple-500 dark:text-blue-400" />
-              <select
-                name="doctor"
-                value={formData.doctor}
-                onChange={handleInputChange}
-                className="pl-10 w-full p-2.5 rounded-lg border border-gray-300/90
-                  dark:border-gray-600 bg-white/95 dark:bg-gray-700/95
-                  text-gray-900 dark:text-gray-100 focus:ring-2
-                  focus:ring-blue-300/50 dark:focus:ring-purple-400/50"
-                required
-              >
-                {doctors.map(doc => (
-                  <option key={doc.id} value={doc.id}>{doc.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+            <DoctorSelector
+                doctors={doctors}
+                selectedDoctorId={formData.doctor}
+                onSelect={(id) => setFormData(prev => ({ ...prev, doctor: id }))}
+            />
 
           {/* Category Selector */}
           <div>

@@ -64,12 +64,12 @@ const DateSelector = ({ selectedDate, onSelect }) => {
 
       {/* Month Picker */}
       {showMonthPicker && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-3 grid grid-cols-3 gap-2 z-20 backdrop-blur-sm border border-gray-200/80 dark:border-gray-600">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-3 grid grid-cols-3 gap-2 z-20 backdrop-blur-sm border border-gray-200/80 dark:border-gray-600 w-full md:w-fit">
           {months.map((m, i) => (
             <button
               key={i}
               onClick={() => handleMonthSelect(i)}
-              className={`px-4 py-2 rounded-lg transition-all ${
+              className={`px-4 py-2 rounded-lg transition-all flex items-center justify-center ${
                 selectedDate.month() === i
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                   : 'bg-gray-100/80 dark:bg-gray-700/80 text-gray-700 dark:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-600/80'
@@ -83,12 +83,12 @@ const DateSelector = ({ selectedDate, onSelect }) => {
 
       {/* Year Picker */}
       {showYearPicker && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-3 grid grid-cols-4 gap-2 z-20 backdrop-blur-sm border border-gray-200/80 dark:border-gray-600">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-3 grid grid-cols-4 gap-2 z-20 backdrop-blur-sm border border-gray-200/80 dark:border-gray-600 w-full md:w-fit">
           {years.map(yr => (
             <button
               key={yr}
               onClick={() => handleYearSelect(yr)}
-              className={`px-3 py-2 rounded-lg transition-all ${
+              className={`rounded-lg transition-all flex items-center justify-center p-1 ${
                 selectedDate.year() === yr
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                   : 'bg-gray-100/80 dark:bg-gray-700/80 text-gray-700 dark:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-600/80'

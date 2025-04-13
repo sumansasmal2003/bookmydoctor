@@ -142,7 +142,7 @@ const ReadOnlyCalendar = ({ weekStart, appointments, onAppointmentSelect }) => {
     </div>
 
       {/* Color Legend */}
-      <div className="flex flex-wrap items-center justify-center gap-4 px-4 py-4 bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-md mt-6 mx-4 border border-gray-200/80 dark:border-gray-600">
+      <div className="flex flex-wrap items-center justify-center gap-4 px-4 py-4 bg-transparent mt-6 mx-4">
         {Object.entries(colors).map(([key, value]) => (
           <div
             key={key}

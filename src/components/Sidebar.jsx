@@ -1,11 +1,12 @@
 import React from 'react';
-import { Calendar as CalendarIcon, List, X } from 'lucide-react';
+import { Calendar as CalendarIcon, List, X, Stethoscope } from 'lucide-react';
 import { FaPhone } from 'react-icons/fa6';
 
 const Sidebar = ({ currentView, onViewChange, isOpen, onClose, appointmentCount = 0 }) => {
   const navItems = [
     { id: 'booking', label: 'Book Doctor', icon: CalendarIcon },
     { id: 'appointments', label: 'Appointments', icon: List },
+    { id: 'doctors', label: 'Doctor Details', icon: Stethoscope },
   ];
 
   return (
